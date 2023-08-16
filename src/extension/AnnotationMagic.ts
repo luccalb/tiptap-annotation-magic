@@ -1,29 +1,23 @@
-import { Extension } from '@tiptap/core';
+import { Extension } from "@tiptap/core";
 
-import { AnnotationPlugin, AnnotationPluginKey } from './AnnotationPlugin';
-import { Connective } from '../contracts/connective.model';
-import { Term } from '../contracts/term.model';
+import { AnnotationPlugin, AnnotationPluginKey } from "./AnnotationPlugin";
+import { Term } from "../contracts/term.model";
 
 export interface AddAnnotationAction {
-  type: 'addAnnotation';
+  type: "addAnnotation";
   data: any;
   from: number;
   to: number;
 }
 
-export interface AddConnectiveAction {
-  type: 'addConnective';
-  data: Connective;
-}
-
 export interface UpdateAnnotationAction {
-  type: 'updateAnnotation';
+  type: "updateAnnotation";
   id: string;
   data: any;
 }
 
 export interface DeleteAnnotationAction {
-  type: 'deleteAnnotation';
+  type: "deleteAnnotation";
   id: string;
 }
 
@@ -34,27 +28,17 @@ export interface AnnotationOptions {
   /**
    * An event listener which receives annotations for the current selection.
    */
-  onUpdate: (items: Term[]) => {};
+  onSelectionChange: (items: Term[]) => {};
   /**
    * An event listener which receives all annotations.
    */
-  onUpdateAll: (items: (Term | Connective)[]) => {};
-
-  /**
-   * A raw map, where annotations will be stored
-   */
-  map: Map<string, any>;
+  onAnnotationListChange: (items: Term[]) => {};
   instance: string;
 }
 
-function getMapFromOptions(options: AnnotationOptions): Map<string, any> {
-  return options.map;
-}
-
-declare module '@tiptap/core' {
+declare module "@tiptap/core" {
   interface Commands<ReturnType> {
     annotation: {
-      addConnective: (data: Connective) => ReturnType;
       addAnnotation: (data: any) => ReturnType;
       updateAnnotation: (id: string, data: any) => ReturnType;
       deleteAnnotation: (id: string) => ReturnType;
@@ -62,33 +46,32 @@ declare module '@tiptap/core' {
   }
 }
 
-export const NaiAnnotation = Extension.create<AnnotationOptions>({
-  name: 'annotation',
+export const AnnotationMagic = Extension.create<AnnotationOptions>({
+  name: "annotation-magic",
 
   priority: 1000,
 
   addOptions() {
     return {
       HTMLAttributes: {
-        class: 'annotation',
+        class: "annotation",
       },
-      onUpdate: (decorations) => decorations,
-      onUpdateAll: (decorations) => decorations,
+      onSelectionChange: (items) => items,
+      onAnnotationListChange: (items) => items,
       document: null,
-      field: 'annotations',
-      map: null,
-      instance: '',
+      field: "annotations",
+      instance: "",
     };
   },
 
   onCreate() {
     // eslint-disable-next-line
     console.log(
-      `[${this.options.instance}] plugin creation  → initial createDecorations`
+      `[${this.options.instance}] plugin creation  → initial createDecorations`,
     );
 
     const transaction = this.editor.state.tr.setMeta(AnnotationPluginKey, {
-      type: 'createDecorations',
+      type: "createDecorations",
     });
 
     // send a transaction to editor view, telling it to re-render annotations
@@ -97,17 +80,6 @@ export const NaiAnnotation = Extension.create<AnnotationOptions>({
 
   addCommands() {
     return {
-      addConnective:
-        (data: Connective) =>
-        ({ dispatch, state }) => {
-          if (dispatch && data) {
-            state.tr.setMeta(AnnotationPluginKey, <AddConnectiveAction>{
-              type: 'addConnective',
-              data,
-            });
-          }
-          return true;
-        },
       addAnnotation:
         (data: any) =>
         ({ dispatch, state }) => {
@@ -119,7 +91,7 @@ export const NaiAnnotation = Extension.create<AnnotationOptions>({
 
           if (dispatch && data) {
             state.tr.setMeta(AnnotationPluginKey, <AddAnnotationAction>{
-              type: 'addAnnotation',
+              type: "addAnnotation",
               from: selection.from,
               to: selection.to,
               data,
@@ -133,7 +105,7 @@ export const NaiAnnotation = Extension.create<AnnotationOptions>({
         ({ dispatch, state }) => {
           if (dispatch) {
             state.tr.setMeta(AnnotationPluginKey, <UpdateAnnotationAction>{
-              type: 'updateAnnotation',
+              type: "updateAnnotation",
               id,
               data,
             });
@@ -146,7 +118,7 @@ export const NaiAnnotation = Extension.create<AnnotationOptions>({
         ({ dispatch, state }) => {
           if (dispatch) {
             state.tr.setMeta(AnnotationPluginKey, <DeleteAnnotationAction>{
-              type: 'deleteAnnotation',
+              type: "deleteAnnotation",
               id,
             });
           }
@@ -159,9 +131,8 @@ export const NaiAnnotation = Extension.create<AnnotationOptions>({
     return [
       AnnotationPlugin({
         HTMLAttributes: this.options.HTMLAttributes,
-        onSelectionChange: this.options.onUpdate,
-        onAnnotationListChange: this.options.onUpdateAll,
-        map: getMapFromOptions(this.options),
+        onSelectionChange: this.options.onSelectionChange,
+        onAnnotationListChange: this.options.onAnnotationListChange,
         instance: this.options.instance,
       }),
     ];

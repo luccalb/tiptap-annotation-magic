@@ -8,16 +8,16 @@ export declare type AnnotationRendering =
 
 export interface Term extends Annotation {
   selectedText?: string;
-  from?: number;
-  to?: number;
+  from: number;
+  to: number;
   rendering?: AnnotationRendering;
   backgroundColor?: string;
 }
 
 export interface RenderedTerm extends Term {
   selectedText?: string;
-  from?: number;
-  to?: number;
+  from: number;
+  to: number;
   rendering: AnnotationRendering;
   backgroundColor?: string;
 }

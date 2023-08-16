@@ -1,17 +1,15 @@
-import { Plugin, PluginKey } from '@tiptap/pm/state';
+import { Plugin, PluginKey } from "@tiptap/pm/state";
 
-import { AnnotationState } from './AnnotationState';
-import {Annotation} from "../contracts/annotation.model";
+import { AnnotationState } from "./AnnotationState";
+import { Term } from "../contracts/term.model";
 
-export const AnnotationPluginKey = new PluginKey('annotation-magic');
-
+export const AnnotationPluginKey = new PluginKey("annotation-magic");
 export interface AnnotationPluginOptions {
   HTMLAttributes: {
     [key: string]: any;
   };
-  onSelectionChange: (items: Annotation[]) => {};
-  onAnnotationListChange: (items: Annotation[]) => {};
-  // map: Map<string, any>;
+  onSelectionChange: (items: Term[]) => {};
+  onAnnotationListChange: (items: Term[]) => {};
   instance: string;
 }
 
@@ -23,9 +21,10 @@ export const AnnotationPlugin = (options: AnnotationPluginOptions) =>
       init() {
         return new AnnotationState({
           HTMLAttributes: options.HTMLAttributes,
-          map: new Map<string, Annotation>(),
+          map: new Map<string, Term>(),
           instance: options.instance,
-          onUpdateAll: options.onAnnotationListChange,
+          onAnnotationListChange: options.onAnnotationListChange,
+          onSelectionChange: options.onSelectionChange,
         });
       },
       apply(transaction, pluginState, oldState, newState) {
@@ -42,19 +41,16 @@ export const AnnotationPlugin = (options: AnnotationPluginOptions) =>
         if (!selection.empty) {
           const annotations = this.getState(state)!.termsAt(
             selection.from,
-            selection.to
+            selection.to,
           );
-          // @ts-ignore
           options.onSelectionChange(annotations);
           return decorations;
         }
 
         // only cursor change
         const annotations = this.getState(state)!.termsAt(selection.from);
-        // const allAnnotations = this.getState(state).allAnnotations();
 
         options.onSelectionChange(annotations);
-        // options.onUpdateAll(allAnnotations);
 
         return decorations;
       },

@@ -1,5 +1,5 @@
-import { NaiAnnotation } from './nai-annotation';
+import { AnnotationMagic } from "./AnnotationMagic";
 
-export * from './nai-annotation';
+export * from "./AnnotationMagic";
 
-export default NaiAnnotation;
+export default AnnotationMagic;

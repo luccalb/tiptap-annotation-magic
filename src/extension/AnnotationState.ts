@@ -1,25 +1,24 @@
-import { EditorState, Transaction } from '@tiptap/pm/state';
-import { Decoration, DecorationSet } from '@tiptap/pm/view';
+import { EditorState, Transaction } from "@tiptap/pm/state";
+import { Decoration, DecorationSet } from "@tiptap/pm/view";
 
-import { TermItem } from './TermItem';
-import { AnnotationPluginKey } from './AnnotationPlugin';
+import { TermItem } from "./TermItem";
+import { AnnotationPluginKey } from "./AnnotationPlugin";
 import {
   AddAnnotationAction,
-  AddConnectiveAction,
   DeleteAnnotationAction,
   UpdateAnnotationAction,
-} from './nai-annotation';
-import { Term } from '../contracts/term.model';
-import { Connective } from '../contracts/connective.model';
-import { createAnnotationRendering } from './OverlapHelper';
+} from "./AnnotationMagic";
+import { Term } from "../contracts/term.model";
+import { createAnnotationRendering } from "./OverlapHelper";
 
 export interface AnnotationStateOptions {
   HTMLAttributes: {
     [key: string]: any;
   };
-  map: Map<string, Term | Connective>;
+  map: Map<string, Term>;
   instance: string;
-  onUpdateAll: (items: any[]) => {};
+  onAnnotationListChange: (items: Term[]) => {};
+  onSelectionChange: (items: Term[]) => {};
 }
 
 export class AnnotationState {
@@ -32,19 +31,7 @@ export class AnnotationState {
   }
 
   randomId() {
-    // TODO: That seems … to simple.
     return Math.floor(Math.random() * 0xffffffff).toString();
-  }
-
-  // @ts-ignore
-  findAnnotation(id: string) {
-    const current = this.decorations.find();
-
-    for (let i = 0; i < current.length; i += 1) {
-      if (current[i].spec.id === id) {
-        return current[i];
-      }
-    }
   }
 
   addAnnotation(action: AddAnnotationAction) {
@@ -58,24 +45,14 @@ export class AnnotationState {
     });
   }
 
-  addConnective(action: AddConnectiveAction) {
-    const { map } = this.options;
-
-    map.set(this.randomId(), action.data);
-  }
-
   updateAnnotation(action: UpdateAnnotationAction) {
     const { map } = this.options;
 
-    map.set(action.id, {
-      ...action.data,
-    });
+    map.set(action.id, action.data);
   }
 
   deleteAnnotation(id: string) {
     const { map } = this.options;
-
-    // TODO: check if annotation is referenced by any connectives
 
     map.delete(id);
   }
@@ -86,7 +63,7 @@ export class AnnotationState {
     });
   }
 
-  allAnnotations() {
+  allAnnotations(): Term[] {
     const { map } = this.options;
     return Array.from(map.entries(), ([key, value]) => {
       return {
@@ -104,7 +81,7 @@ export class AnnotationState {
     const termList = Array.from(map, ([key, value]) => {
       return { ...value, id: key };
     }).filter((value) => {
-      return 'from' in value && 'to' in value;
+      return "from" in value && "to" in value;
     });
 
     const annotationRendering = createAnnotationRendering(termList);
@@ -122,7 +99,7 @@ export class AnnotationState {
         {
           id: annotation.id,
           data: annotation,
-        }
+        },
       );
 
       if (from === to) {
@@ -131,23 +108,23 @@ export class AnnotationState {
           annotation.from,
           from,
           annotation.to,
-          to
+          to,
         );
       }
 
-      let baseClasses = 'border-black p-0.5 font-semibold inline relative ';
+      let baseClasses = "border-black p-0.5 font-semibold inline relative ";
       switch (annotation.rendering) {
-        case 'fragment-left':
-          baseClasses += 'rounded-l-lg -mr-2 pr-2 border-r-0 border-2 z-0';
+        case "fragment-left":
+          baseClasses += "rounded-l-lg -mr-2 pr-2 border-r-0 border-2 z-0";
           break;
-        case 'fragment-middle':
-          baseClasses += 'border-t-2 border-b-2 -mr-2 -ml-2 px-2 z-0';
+        case "fragment-middle":
+          baseClasses += "border-t-2 border-b-2 -mr-2 -ml-2 px-2 z-0";
           break;
-        case 'fragment-right':
-          baseClasses += 'rounded-r-lg -ml-2 pl-2 border-l-0 border-2 z-0';
+        case "fragment-right":
+          baseClasses += "rounded-r-lg -ml-2 pl-2 border-l-0 border-2 z-0";
           break;
-        case 'normal':
-          baseClasses += 'rounded-lg border-2 z-10';
+        case "normal":
+          baseClasses += "rounded-lg border-2 z-10";
           break;
         default:
           break;
@@ -157,7 +134,7 @@ export class AnnotationState {
       let customStyle = undefined;
       if (annotation.backgroundColor) {
         customStyle = {
-          style: 'background-color: ' + annotation.backgroundColor + ';',
+          style: "background-color: " + annotation.backgroundColor + ";",
           class: baseClasses,
         };
       }
@@ -169,14 +146,14 @@ export class AnnotationState {
           customStyle || {
             ...HTMLAttributes,
             class: baseClasses,
-            style: 'background-color: white;',
+            style: "background-color: white;",
           },
           {
             id: annotation.id,
             data: annotation,
             inclusiveEnd: true,
-          }
-        )
+          },
+        ),
       );
     });
 
@@ -188,42 +165,33 @@ export class AnnotationState {
     const action = transaction.getMeta(AnnotationPluginKey) as
       | AddAnnotationAction
       | UpdateAnnotationAction
-      | DeleteAnnotationAction
-      | AddConnectiveAction;
+      | DeleteAnnotationAction;
 
     if (action && action.type) {
-      // eslint-disable-next-line
       console.log(`[${this.options.instance}] action: ${action.type}`);
 
-      if (action.type === 'addAnnotation') {
+      if (action.type === "addAnnotation") {
         this.addAnnotation(action);
       }
 
-      if (action.type === 'updateAnnotation') {
+      if (action.type === "updateAnnotation") {
         this.updateAnnotation(action);
       }
 
-      if (action.type === 'deleteAnnotation') {
+      if (action.type === "deleteAnnotation") {
         this.deleteAnnotation(action.id);
-      }
-
-      if (action.type === 'addConnective') {
-        this.addConnective(action);
       }
 
       this.createDecorations(state);
 
-      this.options.onUpdateAll(this.allAnnotations());
+      this.options.onAnnotationListChange(this.allAnnotations());
 
       return this;
     }
 
-    console.log(
-      `[${this.options.instance}] isChangeOrigin: true → createDecorations`
-    );
     // manually map annotation positions
     this.options.map.forEach((annotation, key) => {
-      if ('from' in annotation && 'to' in annotation) {
+      if ("from" in annotation && "to" in annotation) {
         annotation.from = transaction.mapping.map(annotation.from);
         annotation.to = transaction.mapping.map(annotation.to);
       }
