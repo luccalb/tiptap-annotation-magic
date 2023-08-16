@@ -108,6 +108,8 @@
   },
   "exclude": [
     "**/node_modules",
-    "**/build"
+    "**/build",
+    "**/jest.config.ts",
+    "assets"
   ],
 }
