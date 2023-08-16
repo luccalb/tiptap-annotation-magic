@@ -6,19 +6,18 @@ import { AnnotationPluginKey } from "./AnnotationPlugin";
 import {
   AddAnnotationAction,
   DeleteAnnotationAction,
+  RenderStyles,
   UpdateAnnotationAction,
 } from "./AnnotationMagic";
 import { Term } from "../contracts/term.model";
 import { createAnnotationRendering } from "./OverlapHelper";
 
 export interface AnnotationStateOptions {
-  HTMLAttributes: {
-    [key: string]: any;
-  };
+  styles: RenderStyles;
   map: Map<string, Term>;
   instance: string;
-  onAnnotationListChange: (items: Term[]) => {};
-  onSelectionChange: (items: Term[]) => {};
+  onAnnotationListChange: (items: Term[]) => void;
+  onSelectionChange: (items: Term[]) => void;
 }
 
 export class AnnotationState {
@@ -74,7 +73,7 @@ export class AnnotationState {
   }
 
   createDecorations(state: EditorState) {
-    const { map, HTMLAttributes } = this.options;
+    const { map, styles } = this.options;
     const decorations: Decoration[] = [];
 
     // only terms, not connectives, are rendered
@@ -91,16 +90,10 @@ export class AnnotationState {
       const to = annotation.to;
 
       // eslint-disable-next-line
-      console.log(
-        `[${this.options.instance}] Decoration.inline()`,
-        from,
-        to,
-        HTMLAttributes,
-        {
-          id: annotation.id,
-          data: annotation,
-        },
-      );
+      console.log(`[${this.options.instance}] Decoration.inline()`, from, to, {
+        id: annotation.id,
+        data: annotation,
+      });
 
       if (from === to) {
         console.warn(
@@ -112,19 +105,19 @@ export class AnnotationState {
         );
       }
 
-      let baseClasses = "border-black p-0.5 font-semibold inline relative ";
+      let baseClasses; // = "border-black p-0.5 font-semibold inline relative ";
       switch (annotation.rendering) {
         case "fragment-left":
-          baseClasses += "rounded-l-lg -mr-2 pr-2 border-r-0 border-2 z-0";
+          baseClasses = styles.leftFragment;
           break;
         case "fragment-middle":
-          baseClasses += "border-t-2 border-b-2 -mr-2 -ml-2 px-2 z-0";
+          baseClasses = styles.middleFragment;
           break;
         case "fragment-right":
-          baseClasses += "rounded-r-lg -ml-2 pl-2 border-l-0 border-2 z-0";
+          baseClasses = styles.rightFragment;
           break;
         case "normal":
-          baseClasses += "rounded-lg border-2 z-10";
+          baseClasses = styles.normal;
           break;
         default:
           break;
@@ -144,7 +137,6 @@ export class AnnotationState {
           from,
           to,
           customStyle || {
-            ...HTMLAttributes,
             class: baseClasses,
             style: "background-color: white;",
           },
@@ -190,7 +182,7 @@ export class AnnotationState {
     }
 
     // manually map annotation positions
-    this.options.map.forEach((annotation, key) => {
+    this.options.map.forEach((annotation, _) => {
       if ("from" in annotation && "to" in annotation) {
         annotation.from = transaction.mapping.map(annotation.from);
         annotation.to = transaction.mapping.map(annotation.to);

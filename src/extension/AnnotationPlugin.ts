@@ -2,14 +2,13 @@ import { Plugin, PluginKey } from "@tiptap/pm/state";
 
 import { AnnotationState } from "./AnnotationState";
 import { Term } from "../contracts/term.model";
+import { RenderStyles } from "./AnnotationMagic";
 
 export const AnnotationPluginKey = new PluginKey("annotation-magic");
 export interface AnnotationPluginOptions {
-  HTMLAttributes: {
-    [key: string]: any;
-  };
-  onSelectionChange: (items: Term[]) => {};
-  onAnnotationListChange: (items: Term[]) => {};
+  styles: RenderStyles;
+  onSelectionChange: (items: Term[]) => void;
+  onAnnotationListChange: (items: Term[]) => void;
   instance: string;
 }
 
@@ -20,7 +19,7 @@ export const AnnotationPlugin = (options: AnnotationPluginOptions) =>
     state: {
       init() {
         return new AnnotationState({
-          HTMLAttributes: options.HTMLAttributes,
+          styles: options.styles,
           map: new Map<string, Term>(),
           instance: options.instance,
           onAnnotationListChange: options.onAnnotationListChange,

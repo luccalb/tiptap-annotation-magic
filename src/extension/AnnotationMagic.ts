@@ -3,6 +3,13 @@ import { Extension } from "@tiptap/core";
 import { AnnotationPlugin, AnnotationPluginKey } from "./AnnotationPlugin";
 import { Term } from "../contracts/term.model";
 
+export interface RenderStyles {
+  rightFragment: string;
+  leftFragment: string;
+  normal: string;
+  middleFragment: string;
+}
+
 export interface AddAnnotationAction {
   type: "addAnnotation";
   data: any;
@@ -22,17 +29,15 @@ export interface DeleteAnnotationAction {
 }
 
 export interface AnnotationOptions {
-  HTMLAttributes: {
-    [key: string]: any;
-  };
+  styles: RenderStyles;
   /**
    * An event listener which receives annotations for the current selection.
    */
-  onSelectionChange: (items: Term[]) => {};
+  onSelectionChange: (items: Term[]) => void;
   /**
    * An event listener which receives all annotations.
    */
-  onAnnotationListChange: (items: Term[]) => {};
+  onAnnotationListChange: (items: Term[]) => void;
   instance: string;
 }
 
@@ -53,8 +58,11 @@ export const AnnotationMagic = Extension.create<AnnotationOptions>({
 
   addOptions() {
     return {
-      HTMLAttributes: {
-        class: "annotation",
+      styles: {
+        rightFragment: "",
+        leftFragment: "",
+        normal: "",
+        middleFragment: "",
       },
       onSelectionChange: (items) => items,
       onAnnotationListChange: (items) => items,
@@ -130,7 +138,7 @@ export const AnnotationMagic = Extension.create<AnnotationOptions>({
   addProseMirrorPlugins() {
     return [
       AnnotationPlugin({
-        HTMLAttributes: this.options.HTMLAttributes,
+        styles: this.options.styles,
         onSelectionChange: this.options.onSelectionChange,
         onAnnotationListChange: this.options.onAnnotationListChange,
         instance: this.options.instance,
