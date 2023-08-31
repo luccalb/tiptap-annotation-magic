@@ -44,14 +44,14 @@ export const AnnotationPlugin = <K>(options: AnnotationPluginOptions<K>) =>
           );
           options.onSelectionChange(annotations);
           return decorations;
+        } else {
+          // only cursor change
+          const annotations = this.getState(state)!.termsAt(selection.from);
+
+          options.onSelectionChange(annotations);
+
+          return decorations;
         }
-
-        // only cursor change
-        const annotations = this.getState(state)!.termsAt(selection.from);
-
-        options.onSelectionChange(annotations);
-
-        return decorations;
       },
     },
   });
