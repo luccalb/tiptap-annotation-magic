@@ -20,8 +20,8 @@
     "comments"
   ],
   "dependencies": {
-    "@tiptap/core": "^2.1.0",
-    "@tiptap/pm": "^2.1.0"
+    "@tiptap/core": "^2.1.7",
+    "@tiptap/pm": "^2.1.7"
   },
   "devDependencies": {
     "@types/jest": "^29.5.3",

@@ -6,9 +6,9 @@ export declare type AnnotationRendering =
 
 export interface Annotation<K> {
   id: string;
-  displayName: string;
   from: number;
   to: number;
+  displayName?: string;
   data?: K;
   tag?: string;
   selectedText?: string;

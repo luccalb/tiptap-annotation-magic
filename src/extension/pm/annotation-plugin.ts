@@ -2,7 +2,7 @@ import { Plugin, PluginKey } from "@tiptap/pm/state";
 
 import { AnnotationState } from "./annotation-state";
 import { RenderStyles } from "../annotation-magic";
-import { Annotation } from "../../contracts/annotation";
+import { Annotation } from "../../contracts";
 
 export const AnnotationPluginKey = new PluginKey("annotation-magic");
 export interface AnnotationPluginOptions<K> {

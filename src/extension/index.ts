@@ -1,1 +1,1 @@
-export * from "./annotation-magic";
+export { AnnotationMagic } from "./annotation-magic";

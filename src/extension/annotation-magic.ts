@@ -1,6 +1,6 @@
 import { Extension } from "@tiptap/core";
 import { AnnotationPlugin, AnnotationPluginKey } from "./pm/annotation-plugin";
-import { Annotation } from "../contracts/annotation";
+import { Annotation } from "../contracts";
 
 export interface RenderStyles {
   rightFragment: string;
@@ -11,7 +11,9 @@ export interface RenderStyles {
 
 export interface AddAnnotationAction<K> {
   type: "addAnnotation";
-  annotation: Annotation<K>;
+  from: number;
+  to: number;
+  data: K;
 }
 
 export interface UpdateAnnotationAction<K> {
@@ -48,7 +50,7 @@ declare module "@tiptap/core" {
   }
 }
 
-export const AnnotationMagic = <K>(): Extension<any, any> => {
+export function AnnotationMagic<K>(): Extension {
   return Extension.create<AnnotationOptions<K>>({
     name: "annotation-magic",
 
@@ -87,7 +89,7 @@ export const AnnotationMagic = <K>(): Extension<any, any> => {
     addCommands() {
       return {
         addAnnotation:
-          (annotation: Annotation<K>) =>
+          (data: K) =>
           ({ dispatch, state }) => {
             const { selection } = state;
 
@@ -95,10 +97,12 @@ export const AnnotationMagic = <K>(): Extension<any, any> => {
               return false;
             }
 
-            if (dispatch && annotation) {
+            if (dispatch && data) {
               state.tr.setMeta(AnnotationPluginKey, <AddAnnotationAction<K>>{
                 type: "addAnnotation",
-                annotation,
+                from: selection.from,
+                to: selection.to,
+                data,
               });
             }
 
@@ -142,4 +146,4 @@ export const AnnotationMagic = <K>(): Extension<any, any> => {
       ];
     },
   });
-};
+}

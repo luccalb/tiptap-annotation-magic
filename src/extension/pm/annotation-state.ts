@@ -10,7 +10,7 @@ import {
   UpdateAnnotationAction,
 } from "../annotation-magic";
 import { createAnnotationRendering } from "../rendering-engine";
-import { Annotation } from "../../contracts/annotation";
+import { Annotation } from "../../contracts";
 
 interface AnnotationStateOptions<K> {
   styles: RenderStyles;
@@ -35,9 +35,11 @@ export class AnnotationState<K> {
 
   addAnnotation(action: AddAnnotationAction<K>) {
     const { map } = this.options;
-    const { annotation } = action;
+    const { from, to, data } = action;
 
-    map.set(this.randomId(), annotation);
+    const id = this.randomId();
+
+    map.set(id, { id, from, to, data });
   }
 
   updateAnnotation(action: UpdateAnnotationAction<K>) {
