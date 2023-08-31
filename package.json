@@ -2,13 +2,12 @@
   "name": "tiptap-annotation-magic",
   "author": "Lucca Baumgärtner <kontakt@luccabaumgaertner.de>",
   "license": "MIT",
-  "version": "1.0.2",
+  "version": "1.0.7",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "publish": "npm run test && npm publish",
-    "prepublish": "tsc",
+    "prepack": "tsc && jest",
     "test": "jest"
   },
   "repository": {

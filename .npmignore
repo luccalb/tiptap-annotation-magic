@@ -1,2 +1,5 @@
 **/jest.config.ts
-assets
+/assets
+*.tgz
+/.idea
+*.iml
