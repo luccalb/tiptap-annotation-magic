@@ -1,23 +1,23 @@
 import { EditorState, Transaction } from "@tiptap/pm/state";
 import { Decoration, DecorationSet } from "@tiptap/pm/view";
 
-import { TermItem } from "./TermItem";
-import { AnnotationPluginKey } from "./AnnotationPlugin";
+import { AnnotationDecoration } from "./annotation-decoration";
+import { AnnotationPluginKey } from "./annotation-plugin";
 import {
   AddAnnotationAction,
   DeleteAnnotationAction,
   RenderStyles,
   UpdateAnnotationAction,
-} from "./AnnotationMagic";
-import { Term } from "../contracts/term.model";
-import { createAnnotationRendering } from "./OverlapHelper";
+} from "../annotation-magic";
+import { createAnnotationRendering } from "../rendering-engine";
+import { Annotation } from "../../contracts/annotation";
 
-export interface AnnotationStateOptions {
+interface AnnotationStateOptions {
   styles: RenderStyles;
-  map: Map<string, Term>;
+  map: Map<string, Annotation>;
   instance: string;
-  onAnnotationListChange: (items: Term[]) => void;
-  onSelectionChange: (items: Term[]) => void;
+  onAnnotationListChange: (items: Annotation[]) => void;
+  onSelectionChange: (items: Annotation[]) => void;
 }
 
 export class AnnotationState {
@@ -56,19 +56,16 @@ export class AnnotationState {
     map.delete(id);
   }
 
-  termsAt(position: number, to?: number): Term[] {
+  termsAt(position: number, to?: number): Annotation[] {
     return this.decorations.find(position, to || position).map((decoration) => {
-      return new TermItem(decoration);
+      return new AnnotationDecoration(decoration);
     });
   }
 
-  allAnnotations(): Term[] {
+  allAnnotations(): Annotation[] {
     const { map } = this.options;
-    return Array.from(map.entries(), ([key, value]) => {
-      return {
-        id: key,
-        ...value,
-      };
+    return Array.from(map.entries(), ([_, value]) => {
+      return value;
     });
   }
 

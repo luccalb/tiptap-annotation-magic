@@ -1,5 +1,1 @@
-import { AnnotationMagic } from "./AnnotationMagic";
-
-export * from "./AnnotationMagic";
-
-export default AnnotationMagic;
+export * from "./annotation-magic";

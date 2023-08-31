@@ -1,7 +1,7 @@
-import { Decoration } from '@tiptap/pm/view';
-import { Term } from '../contracts/term.model';
+import { Decoration } from "@tiptap/pm/view";
+import { Annotation } from "../../contracts/annotation";
 
-export class TermItem implements Term {
+export class AnnotationDecoration implements Annotation {
   private decoration!: any;
 
   constructor(decoration: Decoration) {

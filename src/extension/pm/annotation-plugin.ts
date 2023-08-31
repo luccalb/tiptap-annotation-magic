@@ -1,14 +1,14 @@
 import { Plugin, PluginKey } from "@tiptap/pm/state";
 
-import { AnnotationState } from "./AnnotationState";
-import { Term } from "../contracts/term.model";
-import { RenderStyles } from "./AnnotationMagic";
+import { AnnotationState } from "./annotation-state";
+import { RenderStyles } from "../annotation-magic";
+import { Annotation } from "../../contracts/annotation";
 
 export const AnnotationPluginKey = new PluginKey("annotation-magic");
 export interface AnnotationPluginOptions {
   styles: RenderStyles;
-  onSelectionChange: (items: Term[]) => void;
-  onAnnotationListChange: (items: Term[]) => void;
+  onSelectionChange: (items: Annotation[]) => void;
+  onAnnotationListChange: (items: Annotation[]) => void;
   instance: string;
 }
 
@@ -20,7 +20,7 @@ export const AnnotationPlugin = (options: AnnotationPluginOptions) =>
       init() {
         return new AnnotationState({
           styles: options.styles,
-          map: new Map<string, Term>(),
+          map: new Map<string, Annotation>(),
           instance: options.instance,
           onAnnotationListChange: options.onAnnotationListChange,
           onSelectionChange: options.onSelectionChange,

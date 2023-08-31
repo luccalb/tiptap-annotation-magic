@@ -1,20 +1,21 @@
-import { Annotation } from './annotation.model';
-
 export declare type AnnotationRendering =
-  | 'normal'
-  | 'fragment-right'
-  | 'fragment-left'
-  | 'fragment-middle';
+  | "normal"
+  | "fragment-right"
+  | "fragment-left"
+  | "fragment-middle";
 
-export interface Term extends Annotation {
-  selectedText?: string;
+export interface Annotation {
+  id: string;
+  displayName: string;
   from: number;
   to: number;
+  tag?: string;
+  selectedText?: string;
   rendering?: AnnotationRendering;
   backgroundColor?: string;
 }
 
-export interface RenderedTerm extends Term {
+export interface AnnotationFragment extends Annotation {
   selectedText?: string;
   from: number;
   to: number;

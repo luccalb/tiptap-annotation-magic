@@ -1,7 +1,6 @@
 import { Extension } from "@tiptap/core";
-
-import { AnnotationPlugin, AnnotationPluginKey } from "./AnnotationPlugin";
-import { Term } from "../contracts/term.model";
+import { AnnotationPlugin, AnnotationPluginKey } from "./pm/annotation-plugin";
+import { Annotation } from "../contracts/annotation";
 
 export interface RenderStyles {
   rightFragment: string;
@@ -28,16 +27,16 @@ export interface DeleteAnnotationAction {
   id: string;
 }
 
-export interface AnnotationOptions {
+interface AnnotationOptions {
   styles: RenderStyles;
   /**
    * An event listener which receives annotations for the current selection.
    */
-  onSelectionChange: (items: Term[]) => void;
+  onSelectionChange: (items: Annotation[]) => void;
   /**
    * An event listener which receives all annotations.
    */
-  onAnnotationListChange: (items: Term[]) => void;
+  onAnnotationListChange: (items: Annotation[]) => void;
   instance: string;
 }
 
