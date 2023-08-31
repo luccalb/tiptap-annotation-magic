@@ -4,7 +4,7 @@ import {
   AnnotationFragment,
 } from "../contracts/annotation";
 
-export interface ActionKeyframe {
+interface ActionKeyframe {
   action: "open" | "close";
   annotationIndex: number;
   textAnchor: number;
@@ -25,9 +25,9 @@ export const isConflicting = (
 };
 
 export const createAnnotationRendering = (
-  annotations: Annotation[],
-): AnnotationFragment[] => {
-  const renderedAnnotations: AnnotationFragment[] = [];
+  annotations: Annotation<any>[],
+): AnnotationFragment<any>[] => {
+  const renderedAnnotations: AnnotationFragment<any>[] = [];
   const openAnnotationStack: ActionKeyframe[] = [];
   //const actionMap: Map<number, ActionKeyframe[]> = new Map();
   const actionMap: ActionKeyframe[][] = [];
@@ -82,7 +82,7 @@ export const createAnnotationRendering = (
             let from: number = annotationFragmentation[action.annotationIndex]
               ? renderedAnnotations[renderedAnnotations.length - 1].to
               : annotations[action.annotationIndex].from;
-            let normalTerm: AnnotationFragment = {
+            let normalTerm: AnnotationFragment<any> = {
               ...annotations[action.annotationIndex],
               from,
               rendering,
@@ -113,7 +113,7 @@ export const createAnnotationRendering = (
             actionStackPeek.action === "open" &&
             action.action === "open"
           ) {
-            let fragment: AnnotationFragment;
+            let fragment: AnnotationFragment<any>;
             if (annotationFragmentation[actionStackPeek.annotationIndex]) {
               // n-th truncation (n > 1): render a middle fragment
               fragment = {
@@ -148,7 +148,7 @@ export const createAnnotationRendering = (
 };
 
 export const sortAnnotationsByStart = (
-  annotations: Annotation[],
-): Annotation[] => {
+  annotations: Annotation<any>[],
+): Annotation<any>[] => {
   return annotations.sort((a, b) => a.from - b.from);
 };

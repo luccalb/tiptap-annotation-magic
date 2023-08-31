@@ -5,14 +5,14 @@ import { RenderStyles } from "../annotation-magic";
 import { Annotation } from "../../contracts/annotation";
 
 export const AnnotationPluginKey = new PluginKey("annotation-magic");
-export interface AnnotationPluginOptions {
+export interface AnnotationPluginOptions<K> {
   styles: RenderStyles;
-  onSelectionChange: (items: Annotation[]) => void;
-  onAnnotationListChange: (items: Annotation[]) => void;
+  onSelectionChange: (items: Annotation<K>[]) => void;
+  onAnnotationListChange: (items: Annotation<K>[]) => void;
   instance: string;
 }
 
-export const AnnotationPlugin = (options: AnnotationPluginOptions) =>
+export const AnnotationPlugin = <K>(options: AnnotationPluginOptions<K>) =>
   new Plugin({
     key: AnnotationPluginKey,
 
@@ -20,7 +20,7 @@ export const AnnotationPlugin = (options: AnnotationPluginOptions) =>
       init() {
         return new AnnotationState({
           styles: options.styles,
-          map: new Map<string, Annotation>(),
+          map: new Map<string, Annotation<K>>(),
           instance: options.instance,
           onAnnotationListChange: options.onAnnotationListChange,
           onSelectionChange: options.onSelectionChange,

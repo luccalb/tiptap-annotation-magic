@@ -12,20 +12,20 @@ import {
 import { createAnnotationRendering } from "../rendering-engine";
 import { Annotation } from "../../contracts/annotation";
 
-interface AnnotationStateOptions {
+interface AnnotationStateOptions<K> {
   styles: RenderStyles;
-  map: Map<string, Annotation>;
+  map: Map<string, Annotation<K>>;
   instance: string;
-  onAnnotationListChange: (items: Annotation[]) => void;
-  onSelectionChange: (items: Annotation[]) => void;
+  onAnnotationListChange: (items: Annotation<K>[]) => void;
+  onSelectionChange: (items: Annotation<K>[]) => void;
 }
 
-export class AnnotationState {
-  options: AnnotationStateOptions;
+export class AnnotationState<K> {
+  options: AnnotationStateOptions<K>;
 
   decorations = DecorationSet.empty;
 
-  constructor(options: AnnotationStateOptions) {
+  constructor(options: AnnotationStateOptions<K>) {
     this.options = options;
   }
 
@@ -33,21 +33,21 @@ export class AnnotationState {
     return Math.floor(Math.random() * 0xffffffff).toString();
   }
 
-  addAnnotation(action: AddAnnotationAction) {
+  addAnnotation(action: AddAnnotationAction<K>) {
     const { map } = this.options;
-    const { from, to, data } = action;
+    const { annotation } = action;
 
-    map.set(this.randomId(), {
-      from: from,
-      to: to,
-      ...data,
-    });
+    map.set(this.randomId(), annotation);
   }
 
-  updateAnnotation(action: UpdateAnnotationAction) {
+  updateAnnotation(action: UpdateAnnotationAction<K>) {
     const { map } = this.options;
 
-    map.set(action.id, action.data);
+    const annotationToUpdate = map.get(action.id);
+
+    if (annotationToUpdate) {
+      annotationToUpdate.data = action.data;
+    }
   }
 
   deleteAnnotation(id: string) {
@@ -56,13 +56,13 @@ export class AnnotationState {
     map.delete(id);
   }
 
-  termsAt(position: number, to?: number): Annotation[] {
+  termsAt(position: number, to?: number): Annotation<K>[] {
     return this.decorations.find(position, to || position).map((decoration) => {
       return new AnnotationDecoration(decoration);
     });
   }
 
-  allAnnotations(): Annotation[] {
+  allAnnotations(): Annotation<K>[] {
     const { map } = this.options;
     return Array.from(map.entries(), ([_, value]) => {
       return value;
@@ -152,8 +152,8 @@ export class AnnotationState {
   apply(transaction: Transaction, state: EditorState) {
     // Add/Remove annotations
     const action = transaction.getMeta(AnnotationPluginKey) as
-      | AddAnnotationAction
-      | UpdateAnnotationAction
+      | AddAnnotationAction<K>
+      | UpdateAnnotationAction<K>
       | DeleteAnnotationAction;
 
     if (action && action.type) {

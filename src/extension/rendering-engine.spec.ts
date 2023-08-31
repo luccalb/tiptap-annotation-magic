@@ -30,7 +30,7 @@ describe("Test conflicting annotation", () => {
 });
 
 describe("Test sorting of annotaiton list", () => {
-  const testList: Annotation[] = [
+  const testList: Annotation<any>[] = [
     {
       id: "abc",
       from: 5,
@@ -54,7 +54,7 @@ describe("Test sorting of annotaiton list", () => {
     },
   ];
 
-  const resultList: Annotation[] = [
+  const resultList: Annotation<any>[] = [
     {
       id: "abc",
       from: 0,
@@ -85,8 +85,8 @@ describe("Test sorting of annotaiton list", () => {
 
 describe("Mapping the annotation list to a flat representation", () => {
   const testCases: {
-    inputAnnotations: Annotation[];
-    flatMapping: AnnotationFragment[];
+    inputAnnotations: Annotation<any>[];
+    flatMapping: AnnotationFragment<any>[];
     name?: string;
   }[] = [
     {
