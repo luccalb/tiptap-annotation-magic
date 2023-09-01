@@ -2,7 +2,7 @@ import {
   Annotation,
   AnnotationRendering,
   AnnotationFragment,
-} from "../contracts/annotation";
+} from "../../contracts/annotation";
 
 interface ActionKeyframe {
   action: "open" | "close";
