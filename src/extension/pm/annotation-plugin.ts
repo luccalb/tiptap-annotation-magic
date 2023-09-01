@@ -1,18 +1,18 @@
 import { Plugin, PluginKey } from "@tiptap/pm/state";
 
-import { AnnotationState } from "./AnnotationState";
-import { Term } from "../contracts/term.model";
-import { RenderStyles } from "./AnnotationMagic";
+import { AnnotationState } from "./annotation-state";
+import { RenderStyles } from "../annotation-magic";
+import { Annotation } from "../../contracts";
 
 export const AnnotationPluginKey = new PluginKey("annotation-magic");
-export interface AnnotationPluginOptions {
+export interface AnnotationPluginOptions<K> {
   styles: RenderStyles;
-  onSelectionChange: (items: Term[]) => void;
-  onAnnotationListChange: (items: Term[]) => void;
+  onSelectionChange: (items: Annotation<K>[]) => void;
+  onAnnotationListChange: (items: Annotation<K>[]) => void;
   instance: string;
 }
 
-export const AnnotationPlugin = (options: AnnotationPluginOptions) =>
+export const AnnotationPlugin = <K>(options: AnnotationPluginOptions<K>) =>
   new Plugin({
     key: AnnotationPluginKey,
 
@@ -20,7 +20,7 @@ export const AnnotationPlugin = (options: AnnotationPluginOptions) =>
       init() {
         return new AnnotationState({
           styles: options.styles,
-          map: new Map<string, Term>(),
+          map: new Map<string, Annotation<K>>(),
           instance: options.instance,
           onAnnotationListChange: options.onAnnotationListChange,
           onSelectionChange: options.onSelectionChange,
@@ -44,14 +44,14 @@ export const AnnotationPlugin = (options: AnnotationPluginOptions) =>
           );
           options.onSelectionChange(annotations);
           return decorations;
+        } else {
+          // only cursor change
+          const annotations = this.getState(state)!.termsAt(selection.from);
+
+          options.onSelectionChange(annotations);
+
+          return decorations;
         }
-
-        // only cursor change
-        const annotations = this.getState(state)!.termsAt(selection.from);
-
-        options.onSelectionChange(annotations);
-
-        return decorations;
       },
     },
   });

@@ -1,11 +1,11 @@
 import {
+  Annotation,
   AnnotationRendering,
-  RenderedTerm,
-  Term,
-} from '../contracts/term.model';
+  AnnotationFragment,
+} from "../../contracts/annotation";
 
-export interface ActionKeyframe {
-  action: 'open' | 'close';
+interface ActionKeyframe {
+  action: "open" | "close";
   annotationIndex: number;
   textAnchor: number;
 }
@@ -14,7 +14,7 @@ export const isConflicting = (
   fromA: number,
   toA: number,
   fromB: number,
-  toB: number
+  toB: number,
 ): boolean => {
   // case 1: (non-conflicting) A is before B
   if (fromA < toB && toA < fromB) return false;
@@ -25,9 +25,9 @@ export const isConflicting = (
 };
 
 export const createAnnotationRendering = (
-  annotations: Term[]
-): RenderedTerm[] => {
-  const renderedAnnotations: RenderedTerm[] = [];
+  annotations: Annotation<any>[],
+): AnnotationFragment<any>[] => {
+  const renderedAnnotations: AnnotationFragment<any>[] = [];
   const openAnnotationStack: ActionKeyframe[] = [];
   //const actionMap: Map<number, ActionKeyframe[]> = new Map();
   const actionMap: ActionKeyframe[][] = [];
@@ -40,13 +40,13 @@ export const createAnnotationRendering = (
   annotations.forEach((term, index) => {
     // create an opening action keyframe
     let open: ActionKeyframe = {
-      action: 'open',
+      action: "open",
       annotationIndex: index,
       textAnchor: term.from,
     };
     // create a closing action keyframe
     let close: ActionKeyframe = {
-      action: 'close',
+      action: "close",
       annotationIndex: index,
       textAnchor: term.to,
     };
@@ -61,36 +61,36 @@ export const createAnnotationRendering = (
   });
 
   actionMap // STEP 2: iterate the actionMap and generate the annotation UI elements
-    .forEach((actions, textIndex) => {
+    .forEach((actions, _) => {
       actions.forEach((action) => {
         // check if there are still open annotations
         if (openAnnotationStack.length != 0) {
           let actionStackPeek =
             openAnnotationStack[openAnnotationStack.length - 1];
           if (
-            actionStackPeek.action === 'open' &&
+            actionStackPeek.action === "open" &&
             actionStackPeek.annotationIndex === action.annotationIndex &&
-            action.action === 'close'
+            action.action === "close"
           ) {
             // base case: the last opened annotation is closed by next action
             openAnnotationStack.pop();
             let rendering: AnnotationRendering = annotationFragmentation[
               action.annotationIndex
             ]
-              ? 'fragment-right'
-              : 'normal';
+              ? "fragment-right"
+              : "normal";
             let from: number = annotationFragmentation[action.annotationIndex]
               ? renderedAnnotations[renderedAnnotations.length - 1].to
               : annotations[action.annotationIndex].from;
-            let normalTerm: RenderedTerm = {
+            let normalTerm: AnnotationFragment<any> = {
               ...annotations[action.annotationIndex],
               from,
               rendering,
             };
             renderedAnnotations.push(normalTerm);
           } else if (
-            actionStackPeek.action === 'open' &&
-            action.action === 'close'
+            actionStackPeek.action === "open" &&
+            action.action === "close"
           ) {
             // annotation is closed while being overlapped by another annotation
             // -> find "open" action and remove it, otherwise a new truncated segment would be created
@@ -98,7 +98,7 @@ export const createAnnotationRendering = (
               return (
                 a.textAnchor === annotations[action.annotationIndex].from &&
                 a.annotationIndex === action.annotationIndex &&
-                a.action === 'open'
+                a.action === "open"
               );
             });
             if (indexOfActionToRemove > -1) {
@@ -106,19 +106,19 @@ export const createAnnotationRendering = (
             } else {
               throw Error(
                 "Couldn't find opening keyframe for annotation " +
-                  action.annotationIndex
+                  action.annotationIndex,
               );
             }
           } else if (
-            actionStackPeek.action === 'open' &&
-            action.action === 'open'
+            actionStackPeek.action === "open" &&
+            action.action === "open"
           ) {
-            let fragment: RenderedTerm;
+            let fragment: AnnotationFragment<any>;
             if (annotationFragmentation[actionStackPeek.annotationIndex]) {
               // n-th truncation (n > 1): render a middle fragment
               fragment = {
                 ...annotations[actionStackPeek.annotationIndex],
-                rendering: 'fragment-middle',
+                rendering: "fragment-middle",
                 // start where the last rendered annotation ends + 1
                 from: renderedAnnotations[renderedAnnotations.length - 1].to,
                 // stop where the next annotation begins - 1
@@ -128,7 +128,7 @@ export const createAnnotationRendering = (
               // first-time-truncation: a new annotation begins, truncating the old open annotation
               fragment = {
                 ...annotations[actionStackPeek.annotationIndex],
-                rendering: 'fragment-left',
+                rendering: "fragment-left",
                 to: annotations[action.annotationIndex].from,
               };
               // mark the previous annotation as fragmented, by saving where the fragment ends
@@ -138,7 +138,7 @@ export const createAnnotationRendering = (
             renderedAnnotations.push(fragment);
             openAnnotationStack.push(action);
           }
-        } else if (action.action === 'open') {
+        } else if (action.action === "open") {
           openAnnotationStack.push(action);
         }
       });
@@ -147,6 +147,8 @@ export const createAnnotationRendering = (
   return renderedAnnotations;
 };
 
-export const sortAnnotationsByStart = (annotations: Term[]): Term[] => {
+export const sortAnnotationsByStart = (
+  annotations: Annotation<any>[],
+): Annotation<any>[] => {
   return annotations.sort((a, b) => a.from - b.from);
 };

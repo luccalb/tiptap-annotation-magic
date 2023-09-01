@@ -1,7 +1,7 @@
-import { Decoration } from '@tiptap/pm/view';
-import { Term } from '../contracts/term.model';
+import { Decoration } from "@tiptap/pm/view";
+import { Annotation } from "../../contracts";
 
-export class TermItem implements Term {
+export class AnnotationDecoration<K> implements Annotation<K> {
   private decoration!: any;
 
   constructor(decoration: Decoration) {
@@ -31,7 +31,7 @@ export class TermItem implements Term {
     return this.decoration.type.spec.data.selectedText;
   }
 
-  get data() {
+  get data(): K {
     return this.decoration.type.spec.data;
   }
 

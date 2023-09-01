@@ -18,16 +18,25 @@ and are therefore not a part of the Prosemirror Document.
 
 ### Configuration
 
+Define a model if you want to store data in annotations.
+
+```{ts}
+interface AnnotationData {
+    name: string;
+    magicNumber: number;
+}
+```
+
 Add `AnnotationMagic` to the list of your extensions.
 
 ```{ts}
 extensions: [
     StarterKit,
-    AnnotationMagic.configure({
-        onAnnotationListChange: (annotations) => {
+    AnnotationMagic<AnnotationData>().configure({
+        onAnnotationListChange: (annotations: Annotation<AnnotationData>[]) => {
             // Callback when annotation is created/deleted/updated
         },
-        onSelectionChange: (selectedAnnotations) => {
+        onSelectionChange: (selectedAnnotations: Annotation<AnnotationData>[]) => {
             // Callback when the selected editor text changes
         },
         styles: {

@@ -2,7 +2,7 @@
   "name": "tiptap-annotation-magic",
   "author": "Lucca Baumgärtner <kontakt@luccabaumgaertner.de>",
   "license": "MIT",
-  "version": "1.0.7",
+  "version": "2.0.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
@@ -14,10 +14,16 @@
     "type": "git",
     "url": "https://github.com/luccalb/tiptap-annotation-magic"
   },
-  "keywords": ["tiptap", "annotation", "comments"],
+  "keywords": [
+    "tiptap",
+    "annotation",
+    "comments",
+    "wysiwyg",
+    "nlp"
+  ],
   "dependencies": {
-    "@tiptap/core": "^2.1.0",
-    "@tiptap/pm": "^2.1.0"
+    "@tiptap/core": "^2.1.7",
+    "@tiptap/pm": "^2.1.7"
   },
   "devDependencies": {
     "@types/jest": "^29.5.3",
