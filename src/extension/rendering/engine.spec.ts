@@ -2,7 +2,7 @@ import {
   createAnnotationRendering,
   isConflicting,
   sortAnnotationsByStart,
-} from "./rendering-engine";
+} from "./engine";
 import { Annotation, AnnotationFragment } from "../contracts/annotation";
 
 const conflictTestCases = [
