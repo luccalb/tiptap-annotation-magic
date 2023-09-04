@@ -29,11 +29,8 @@ export const createAnnotationRendering = (
 ): AnnotationFragment<any>[] => {
   const renderedAnnotations: AnnotationFragment<any>[] = [];
   const openAnnotationStack: ActionKeyframe[] = [];
-  //const actionMap: Map<number, ActionKeyframe[]> = new Map();
   const actionMap: ActionKeyframe[][] = [];
   const annotationFragmentation: boolean[] = [];
-
-  // annotations = sortAnnotationsByStart(annotations);
 
   // STEP 1: Create a Map, containing the rendering actions for each index in the document.
   // this could be opening or closing an annotation
@@ -87,7 +84,9 @@ export const createAnnotationRendering = (
               from,
               rendering,
             };
-            renderedAnnotations.push(normalTerm);
+            if (normalTerm.from < normalTerm.to) {
+              renderedAnnotations.push(normalTerm);
+            }
           } else if (
             actionStackPeek.action === "open" &&
             action.action === "close"
@@ -131,11 +130,13 @@ export const createAnnotationRendering = (
                 rendering: "fragment-left",
                 to: annotations[action.annotationIndex].from,
               };
-              // mark the previous annotation as fragmented, by saving where the fragment ends
+              // mark the previous annotation as fragmented
               annotationFragmentation[actionStackPeek.annotationIndex] = true;
             }
 
-            renderedAnnotations.push(fragment);
+            if (fragment.from < fragment.to) {
+              renderedAnnotations.push(fragment);
+            }
             openAnnotationStack.push(action);
           }
         } else if (action.action === "open") {

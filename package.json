@@ -2,7 +2,7 @@
   "name": "tiptap-annotation-magic",
   "author": "Lucca Baumgärtner <kontakt@luccabaumgaertner.de>",
   "license": "MIT",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {

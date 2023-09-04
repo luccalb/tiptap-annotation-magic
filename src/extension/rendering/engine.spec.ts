@@ -29,7 +29,7 @@ describe("Test conflicting annotation", () => {
   });
 });
 
-describe("Test sorting of annotaiton list", () => {
+describe("Test sorting of annotation list", () => {
   const testList: Annotation<any>[] = [
     {
       id: "abc",
@@ -370,6 +370,102 @@ describe("Mapping the annotation list to a flat representation", () => {
           displayName: "X",
           tag: "X",
           rendering: "fragment-right",
+        },
+      ],
+    },
+    {
+      name: "Exact overlap - from",
+      inputAnnotations: [
+        {
+          id: "abc",
+          from: 0,
+          to: 8,
+          displayName: "Y",
+          tag: "Y",
+        },
+        {
+          id: "abc",
+          from: 0,
+          to: 5,
+          displayName: "X",
+          tag: "X",
+        },
+        {
+          id: "abc",
+          from: 10,
+          to: 15,
+          displayName: "Z",
+          tag: "Z",
+        },
+      ],
+      flatMapping: [
+        {
+          id: "abc",
+          from: 0,
+          to: 5,
+          displayName: "X",
+          tag: "X",
+          rendering: "normal",
+        },
+        {
+          id: "abc",
+          from: 5,
+          to: 8,
+          displayName: "Y",
+          tag: "Y",
+          rendering: "fragment-right",
+        },
+        {
+          id: "abc",
+          from: 10,
+          to: 15,
+          displayName: "Z",
+          tag: "Z",
+          rendering: "normal",
+        },
+      ],
+    },
+    {
+      name: "Exact overlap - from and to",
+      inputAnnotations: [
+        {
+          id: "abc",
+          from: 0,
+          to: 8,
+          displayName: "X",
+          tag: "X",
+        },
+        {
+          id: "abc",
+          from: 0,
+          to: 8,
+          displayName: "Y",
+          tag: "Y",
+        },
+        {
+          id: "abc",
+          from: 10,
+          to: 15,
+          displayName: "Z",
+          tag: "Z",
+        },
+      ],
+      flatMapping: [
+        {
+          id: "abc",
+          from: 0,
+          to: 8,
+          displayName: "Y",
+          tag: "Y",
+          rendering: "normal",
+        },
+        {
+          id: "abc",
+          from: 10,
+          to: 15,
+          displayName: "Z",
+          tag: "Z",
+          rendering: "normal",
         },
       ],
     },
